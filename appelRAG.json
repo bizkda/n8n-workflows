@@ -156,7 +156,7 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        288,
+        80,
         -144
       ],
       "id": "f9a5394f-61cb-48d1-b61e-c381ca924981",
@@ -164,7 +164,9 @@
     },
     {
       "parameters": {
-        "options": {}
+        "options": {
+          "systemMessage": "You are a financial analyst assistant with access to Apple Inc.'s Q4 and full-year FY2019 financial statements (fiscal year ended September 28, 2019).\n\nYou can answer questions about:\n- Revenue by product: iPhone, Mac, iPad, Wearables/Home/Accessories, Services\n- Revenue by region: Americas, Europe, Greater China, Japan, Rest of Asia Pacific\n- Profitability: gross margin, operating income, net income\n- Balance sheet: assets, liabilities, shareholders' equity, cash position\n- Cash flows: operating, investing, and financing activities\n- Year-over-year comparisons between FY2019 and FY2018\n\nAlways cite specific figures in USD millions. Be concise and precise. If a question is outside the scope of this report, say so clearly."
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
@@ -197,8 +199,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
       "typeVersion": 1,
       "position": [
-        336,
-        176
+        400,
+        128
       ],
       "id": "8114078a-6ef4-4612-a601-29fb6f2cbc7b",
       "name": "Ollama Chat Model",
@@ -214,11 +216,90 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.4,
       "position": [
-        480,
-        176
+        512,
+        128
       ],
       "id": "e008df96-b02c-4542-871d-369d62d82edb",
       "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "description": "Apple Inc. condensed consolidated financial statements for Q4 and full-year FY2019 (fiscal year ended September 28, 2019). Includes: income statement with net sales by product (iPhone, Mac, iPad, Wearables, Services) and by region (Americas, Europe, Greater China, Japan, Rest of Asia Pacific); balance sheet with total assets of $338.5B, cash of $48.8B, and shareholders equity of $90.5B; cash flow statement with $69.4B operating cash flow and $66.9B in share buybacks. All figures in USD millions."
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        144
+      ],
+      "id": "d47ace64-e769-42af-a51f-e500be258fb7",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "n8nv2",
+          "mode": "list",
+          "cachedResultName": "n8nv2"
+        },
+        "options": {
+          "pineconeNamespace": "applen8n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        288
+      ],
+      "id": "81952460-f83f-4996-989c-d841b60f2fc0",
+      "name": "Pinecone Vector Store1",
+      "credentials": {
+        "pineconeApi": {
+          "id": "zhgYjwXbNij2quq0",
+          "name": "Pinecone account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        368,
+        496
+      ],
+      "id": "3bf0c242-eba8-406f-9126-8250534cfbc1",
+      "name": "Embeddings Ollama1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "Rqa0iU3hmvjbG0PL",
+          "name": "Ollama account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "minimax-m3:cloud",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        896,
+        304
+      ],
+      "id": "7e088b4d-1e9a-4c87-aa3d-da7ea66c8e0b",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "Rqa0iU3hmvjbG0PL",
+          "name": "Ollama account 2"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -299,6 +380,50 @@
           }
         ]
       ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -310,7 +435,7 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false
   },
-  "versionId": "6ababcff-644b-450c-99b4-193b70328c7c",
+  "versionId": "f575f7b7-2904-47ac-8639-9e044395fc33",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "ae2b54ccaf1793137b9f485e183251c8268127f403edb33948a067c485da07da"
